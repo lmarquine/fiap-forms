@@ -12,6 +12,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,600;0,800;0,900;1,100;1,200;1,300;1,400;1,600;1,800;1,900&family=Roboto:ital,wght@0,100;0,300;0,400;0,700;0,900;1,100;1,300;1,400;1,700;1,900&display=swap" rel="stylesheet">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js" integrity="sha512-894YE6QWD5I59HgZOGReFYm4dnWc1Qt5NtvYSaNcOP+u1T9qYdvdihz0PPSiiqn/+/3e7Jo4EaG7TubfWGUrMQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
     <script src="./src/js/menu-mobile.js"></script>
+    <script src="./src/js/jquery.mask.min.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" integrity="sha512-9usAa10IRO0HhonpyAIVpjrylPvoDwiPUiKdWk5t3PyolY1cOd4DSE0Ga+ri4AuTroPR5aQvXU9xC6qOPnzFeg==" crossorigin="anonymous" referrerpolicy="no-referrer" />
     <link rel="icon" type="image/png" sizes="60x60" href="./assets/images/icons/favicon.png">
 </head>
@@ -69,6 +70,16 @@
                             value="Inglaterra">
                 </datalist>
 
+                <div class="postcode-block">
+                    <label for="postcode">CEP</label>
+                    <input class="field field-attraction field-attraction__address postcode"
+                           name="postcode"
+                           type="text"
+                           id="postcode"
+                           placeholder="CEP"
+                           required/>
+                </div>
+
                 <label for="street">Rua</label>
                 <input class="field field-attraction field-attraction__address street"
                        name="street"
@@ -118,7 +129,7 @@
 
                 <label for="telephone">Telefone</label>
                 <input type="tel"
-                       class="field field-telephone"
+                       class="field field-telephone phone_with_ddd"
                        name="telephone"
                        id="telephone"
                        placeholder="Telefone"/>
@@ -164,7 +175,7 @@
                 </div>
 
                 <label for="price">Preço</label>
-                <input class="field field-price field-price__amount price"
+                <input class="field field-price field-price__amount price money"
                        name="price"
                        type="text"
                        id="price"
@@ -247,5 +258,55 @@
         </form>
     </div>
 </div>
+<script type="text/javascript">
+    $(document).ready(function(){
+        $('.postcode').mask('00000-000');
+        $('.phone_with_ddd').mask('(00) 0000-00000');
+        $('.money').mask('000.000.000.000.000,00', {reverse: true});
+
+        $('#country').on('blur', function(event) {
+            $('.postcode-block').removeClass('show');
+            if ( event.currentTarget.value === 'Brasil' ) {
+                $('.postcode-block').addClass('show');
+                $('#postcode').focus();
+            }
+        })
+
+        $('#postcode').on('blur', function(event) {
+            let address = getAddress(event.currentTarget.value);
+            $('#street').val('');
+            $('#neighborhood').val('');
+            $('#city').val('');
+
+            $('#street').removeAttr("readonly");
+            $('#neighborhood').removeAttr("readonly");
+            $('#city').removeAttr("readonly");
+
+            if ( !address.erro ) {
+                $('#street').val(address.logradouro);
+                $('#street').attr("readonly", true);
+
+                $('#neighborhood').val(address.bairro);
+                $('#neighborhood').attr("readonly", true);
+
+                $('#city').val(address.localidade);
+                $('#city').attr("readonly", true);
+
+                $('#number').focus();
+            }
+        })
+
+        let getAddress = (value) => {
+            let addressFinded;
+
+            $.ajax({url: `https://viacep.com.br/ws/${value}/json/`,
+                async: false,
+                success: function(result){
+                    addressFinded = result;
+                }});
+            return addressFinded;
+        }
+    });
+</script>
 </body>
 </html>
