@@ -154,6 +154,14 @@ input[name="yesno"]:checked+label[for="no"]:before {
     color: var(--color-white);
 }
 
+.postcode-block {
+    display: none;
+}
+
+.postcode-block.show {
+    display: block;
+}
+
 @media only screen and (max-width: 768px) {
     .container.register h1 {
         text-align: center;
